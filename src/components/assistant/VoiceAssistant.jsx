@@ -5,27 +5,36 @@ export function VoiceAssistant() {
   const { listening, transcript, speak, startListening } = useVoiceAssistant();
 
   return (
-    <div style={{ padding: '15px', background: '#1c1c24', borderRadius: '8px', border: '1px solid #3b3b4a' }}>
+    <div style={{ padding: '16px', background: 'var(--cream-bg)', borderRadius: '10px', border: '2px solid var(--border-red)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h4 style={{ margin: 0, color: '#a78bfa' }}>🎙️ AI Voice Mentor</h4>
+        <h4 style={{ margin: 0, color: 'var(--red-dark)', fontFamily: 'var(--font-heading)', fontWeight: '800', fontSize: '13px' }}>
+          🎙️ AI Voice Mentor
+        </h4>
         <button
           onClick={startListening}
+          className="btn-secondary"
           style={{
-            padding: '6px 12px',
-            background: listening ? '#ef4444' : '#8b5cf6',
-            border: 'none',
-            color: '#fff',
-            borderRadius: '20px',
-            cursor: 'pointer'
+            padding: '4px 12px',
+            fontSize: '11px',
+            minHeight: '28px',
+            border: '1px solid var(--red-dark)'
           }}
         >
           {listening ? 'Listening...' : 'Speak'}
         </button>
       </div>
-      {transcript && <p style={{ fontSize: '13px', background: '#262632', padding: '8px', borderRadius: '4px', marginTop: '10px' }}>"{transcript}"</p>}
-      <button onClick={() => speak('Welcome to the 3D Virtual Hardware Laboratory!')} style={{ marginTop: '10px', fontSize: '12px', background: 'transparent', border: '1px solid #555', color: '#ccc', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>
+      {transcript && (
+        <p style={{ fontSize: '12px', background: 'var(--white)', padding: '8px', borderRadius: '6px', marginTop: '10px', border: '1px solid var(--border-red)', color: 'var(--red-dark)', fontWeight: '600' }}>
+          "{transcript}"
+        </p>
+      )}
+      <button 
+        onClick={() => speak('Welcome to the 3D Virtual Hardware Laboratory!')} 
+        style={{ marginTop: '10px', fontSize: '11px', background: 'transparent', border: '1px solid var(--red-dark)', color: 'var(--red-dark)', padding: '4px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '700' }}
+      >
         Test Voice Response
       </button>
     </div>
   );
 }
+
