@@ -3,19 +3,32 @@ import { ProjectList } from '../components/projects/ProjectList';
 import { SaveProject } from '../components/projects/SaveProject';
 import { LoadProject } from '../components/projects/LoadProject';
 
-export function Projects() {
+export function Projects({ onNavigate }) {
   return (
-    <div style={{ maxWidth: '800px', margin: '40px auto', padding: '20px' }}>
-      <h2 style={{ color: '#61dafb', marginTop: 0 }}>Project Management</h2>
-      <div style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
-        <div style={{ flex: 1 }}>
-          <SaveProject onSave={(title) => alert(`Saved: ${title}`)} />
-        </div>
-        <LoadProject onLoad={() => alert('Loading project file...')} />
+    <div style={{ maxWidth: '1040px', margin: '40px auto', padding: '0 24px' }}>
+      <div style={{ marginBottom: '32px' }}>
+        <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', fontWeight: '800', marginBottom: '8px', color: '#FFFFFF' }}>
+          Project <span className="highlight-orange">Repository</span>
+        </h1>
+        <p style={{ color: 'var(--text-muted)', fontSize: '15px', fontWeight: '400' }}>
+          Save, manage, export, and load 3D hardware schematic files.
+        </p>
       </div>
-      <div style={{ background: '#1c1c24', borderRadius: '8px', border: '1px solid #2d2d3a' }}>
-        <ProjectList />
+
+      <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
+        <div style={{ flex: 1, minWidth: '280px' }}>
+          <SaveProject onSave={(title) => alert(`Saved schematic: ${title}`)} />
+        </div>
+        <div>
+          <LoadProject onLoad={() => alert('Loading project schematic...')} />
+        </div>
+      </div>
+
+      <div className="theme-card" style={{ padding: '24px', borderRadius: '18px' }}>
+        <ProjectList onSelect={() => onNavigate && onNavigate('Workbench')} />
       </div>
     </div>
   );
 }
+
+

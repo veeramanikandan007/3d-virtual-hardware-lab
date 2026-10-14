@@ -16,11 +16,13 @@ export default function App() {
       case 'Login':
         return <Login onLogin={() => setCurrentPage('Workbench')} />;
       case 'Dashboard':
-        return <Dashboard />;
+        return <Dashboard onNavigate={setCurrentPage} />;
+      case 'Circuit Designer':
+      case 'Components':
       case 'Workbench':
-        return <Workbench />;
+        return <Workbench activeTab={currentPage} />;
       case 'Projects':
-        return <Projects />;
+        return <Projects onNavigate={setCurrentPage} />;
       default:
         return <Workbench />;
     }
@@ -32,3 +34,4 @@ export default function App() {
     </AppLayout>
   );
 }
+

@@ -2,8 +2,9 @@ import React from 'react';
 
 export function LoadProject({ onLoad }) {
   return (
-    <button onClick={onLoad} style={{ padding: '8px 16px', background: '#3b82f6', border: 'none', color: '#fff', borderRadius: '4px', cursor: 'pointer' }}>
+    <button onClick={onLoad} className="btn-outline" style={{ padding: '10px 18px', fontSize: '13px', borderWidth: '2px', minHeight: '44px' }}>
       📂 Open Project File (.json)
     </button>
   );
 }
+

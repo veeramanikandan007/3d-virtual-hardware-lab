@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Grid, ContactShadows } from '@react-three/drei';
 import * as THREE from 'three';
@@ -8,15 +8,48 @@ import { Wire } from './Wire';
 import { ActiveWireDraft } from './ActiveWireDraft';
 import { componentsData } from '../../data/components';
 
-function SceneContent() {
-  const {
-    placedComponents,
-    placedWires,
-    selectedWireId,
-    removeWire,
-    isDraggingObject,
-    selectedWireId: currentSelectedWire
-  } = useWorkbench();
+function CameraController({ viewMode }) {
+  const controlsRef = useRef();
+
+  useEffect(() => {
+    if (!controlsRef.current || !viewMode) return;
+    const controls = controlsRef.current;
+    switch (viewMode) {
+      case 'Top':
+        controls.object.position.set(0, 1.2, 0.001);
+        controls.target.set(0, 0, 0);
+        break;
+      case 'Front':
+        controls.object.position.set(0, 0.2, 1.0);
+        controls.target.set(0, 0, 0);
+        break;
+      case 'Side':
+        controls.object.position.set(1.0, 0.2, 0);
+        controls.target.set(0, 0, 0);
+        break;
+      case 'Isometric':
+        controls.object.position.set(0.7, 0.7, 0.7);
+        controls.target.set(0, 0, 0);
+        break;
+      case '3D View':
+      default:
+        controls.object.position.set(0.6, 0.6, 0.7);
+        controls.target.set(0, 0, 0);
+        break;
+    }
+    controls.update();
+  }, [viewMode]);
+
+  return null;
+}
+
+function SceneContent({ viewMode = '3D View' }) {
+  const workbench = useWorkbench();
+  const placedComponents = workbench?.placedComponents || [];
+  const placedWires = workbench?.placedWires || [];
+  const selectedWireId = workbench?.selectedWireId || null;
+  const removeWire = workbench?.removeWire;
+  const isDraggingObject = workbench?.isDraggingObject || false;
 
   // Resolve absolute 3D world position of a pin
   const getPinWorldPos = (instanceId, pinId) => {
@@ -26,7 +59,7 @@ function SceneContent() {
     const meta = componentsData.find((item) => item.id === comp.componentId);
     if (!meta) return comp.position;
 
-    const pinMeta = meta.pins.find((p) => p.id === pinId);
+    const pinMeta = meta.pins?.find((p) => p.id === pinId);
     if (!pinMeta) return comp.position;
 
     const localVec = new THREE.Vector3(...pinMeta.pos);
@@ -42,16 +75,18 @@ function SceneContent() {
   // Keyboard shortcut listener to delete selected wire
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if ((e.key === 'Delete' || e.key === 'Backspace') && currentSelectedWire) {
-        removeWire(currentSelectedWire);
+      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedWireId && removeWire) {
+        removeWire(selectedWireId);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentSelectedWire, removeWire]);
+  }, [selectedWireId, removeWire]);
 
   return (
     <>
+      <CameraController viewMode={viewMode} />
+
       {/* Studio Lighting System */}
       <ambientLight intensity={0.9} />
       <directionalLight
@@ -108,18 +143,55 @@ function SceneContent() {
         makeDefault
         enabled={!isDraggingObject}
         maxPolarAngle={Math.PI / 2 - 0.05}
-        minDistance={0.3}
-        maxDistance={7}
+        minDistance={0.2}
+        maxDistance={8}
       />
     </>
   );
 }
 
-export function ThreeDCanvas() {
+export function ThreeDCanvas({ viewMode = '3D View', onDropComponent }) {
+  const workbench = useWorkbench();
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const data = e.dataTransfer.getData('application/json');
+    if (!data) return;
+    try {
+      const item = JSON.parse(data);
+      if (workbench?.addComponent) {
+        workbench.addComponent(item.id);
+      } else if (onDropComponent) {
+        onDropComponent(item);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
   return (
-    <div style={{ width: '100%', height: '100%', background: '#090d16', position: 'relative' }}>
-      <Canvas camera={{ position: [0.8, 1.2, 1.4], fov: 45 }} shadows>
-        <SceneContent />
+    <div
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+      style={{
+        width: '100%',
+        height: '100%',
+        position: 'relative',
+        background: '#090d16',
+        outline: 'none'
+      }}
+    >
+      <Canvas
+        camera={{ position: [0.6, 0.6, 0.7], fov: 45 }}
+        shadows
+        gl={{ antialias: true, alpha: false }}
+        style={{ width: '100%', height: '100%' }}
+      >
+        <SceneContent viewMode={viewMode} />
       </Canvas>
     </div>
   );
