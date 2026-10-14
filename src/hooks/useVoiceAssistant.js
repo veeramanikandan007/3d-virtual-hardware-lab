@@ -1,19 +1,52 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { speechService } from '../services/speechService';
 
 export function useVoiceAssistant() {
-  const [listening, setListening] = useState(false);
-  const [transcript, setTranscript] = useState('');
+  const [state, setState] = useState(speechService.getState());
+  const [transcriptState, setTranscriptState] = useState({ text: '', isFinal: false });
 
-  const speak = (text) => speechService.speak(text);
-
-  const startListening = () => {
-    setListening(true);
-    speechService.listen((result) => {
-      setTranscript(result);
-      setListening(false);
+  useEffect(() => {
+    const unsubState = speechService.on('stateChange', (newState) => {
+      setState({ ...newState });
     });
-  };
+    
+    const unsubTranscript = speechService.on('transcript', (t) => {
+      setTranscriptState(t);
+    });
+    
+    return () => {
+      unsubState();
+      unsubTranscript();
+    };
+  }, []);
 
-  return { listening, transcript, speak, startListening };
+  const startListening = useCallback(() => speechService.startListening(), []);
+  const stopListening = useCallback(() => speechService.stopListening(), []);
+  const simulateInput = useCallback((text) => speechService.simulateVoiceInput(text), []);
+  const speak = useCallback((text, priority) => speechService.speakMessage(text, priority), []);
+  const stopSpeech = useCallback(() => speechService.stop(), []);
+  const setLanguage = useCallback((lang) => speechService.setLanguage(lang), []);
+
+  const useCommandSubscription = useCallback((callback) => {
+    useEffect(() => {
+      return speechService.on('command', callback);
+    }, [callback]);
+  }, []);
+
+  return {
+    state,
+    listening: state.listening,
+    language: state.language,
+    setLanguage,
+    transcript: transcriptState.text || '',
+    transcriptObj: transcriptState,
+    startListening,
+    stopListening,
+    simulateInput,
+    speak,
+    stopSpeech,
+    useCommandSubscription
+  };
 }
+
+export default useVoiceAssistant;

@@ -6,9 +6,9 @@ export function Navbar({ currentPage, setCurrentPage }) {
 
   const pages = [
     { name: 'Dashboard', label: 'Dashboard' },
-    { name: 'Circuit Designer', label: 'Circuit Designer' },
     { name: 'Workbench', label: '3D Simulation' },
-    { name: 'Components', label: 'Components' },
+    { name: 'Components', label: 'Catalog' },
+    { name: 'Voice Lab', label: 'Voice AI' },
     { name: 'Projects', label: 'Projects' },
   ];
 

@@ -5,6 +5,7 @@ import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { Workbench } from './pages/Workbench';
 import { Projects } from './pages/Projects';
+import Member3Dashboard from './components/member3/Member3Dashboard';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('Workbench');
@@ -21,6 +22,9 @@ export default function App() {
       case 'Components':
       case 'Workbench':
         return <Workbench activeTab={currentPage} />;
+      case 'Voice Lab':
+      case 'Voice Assistant':
+        return <Member3Dashboard />;
       case 'Projects':
         return <Projects onNavigate={setCurrentPage} />;
       default:
@@ -34,4 +38,3 @@ export default function App() {
     </AppLayout>
   );
 }
-
